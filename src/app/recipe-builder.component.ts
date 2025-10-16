@@ -67,15 +67,25 @@ export class RecipeBuilderComponent {
   }
 
   /**
+   * Fast lookup map from ingredient id to ingredient for heavy-lifting logic
+   */
+  private ingredientById = computed(() => {
+    const map = new Map<string, Ingredient>();
+    for (const ing of this.ingredients() ?? []) {
+      map.set(ing.id, ing);
+    }
+    return map;
+  });
+
+  /**
    * Method to compute total calories of selected ingredients (computed) and return 0 if none selected
    */
   totalCalories = computed(() => {
     const selected = this.selectedIngredients();
     if (!selected || selected.length === 0) return 0;
-    const all = this.ingredients();
-    if (!all) return 0;
+    const byId = this.ingredientById();
     return selected.reduce((sum, id) => {
-      const ing = all.find((i) => i.id === id);
+      const ing = byId.get(id);
       return sum + (ing ? ing.calories : 0);
     }, 0);
   });
@@ -86,9 +96,7 @@ export class RecipeBuilderComponent {
    * @returns 
    */
   getIngredientById(id: string): Ingredient | undefined {
-    const all = this.ingredients();
-    if (!all) return undefined;
-    return all.find((ing) => ing.id === id);
+    return this.ingredientById().get(id);
   }
 
   /**
@@ -113,12 +121,15 @@ export class RecipeBuilderComponent {
    * Method to group ingredients by category for display (computed) and return empty arrays if none
    */
   groupedIngredients = computed(() => {
-    const all = this.ingredients() ?? [];
-    return {
-      protein: all.filter((i) => i.category === 'protein'),
-      vegetable: all.filter((i) => i.category === 'vegetable'),
-      grain: all.filter((i) => i.category === 'grain'),
-    } as Record<'protein' | 'vegetable' | 'grain', Ingredient[]>;
+    const grouped: Record<'protein' | 'vegetable' | 'grain', Ingredient[]> = {
+      protein: [],
+      vegetable: [],
+      grain: [],
+    };
+    for (const ing of this.ingredients() ?? []) {
+      grouped[ing.category].push(ing);
+    }
+    return grouped;
   });
 
   /**

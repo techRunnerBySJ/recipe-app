@@ -1,10 +1,10 @@
 <header class="app-header">
   <div class="container brand">
-    <h1>RecipeApp</h1>
+    <h1 aria-label="RecipeApp">RecipeApp</h1>
   </div>
 </header>
 
-<main class="container" style="padding: 20px 0;">
+<main class="container" style="padding: 20px 0;" aria-label="Main Content" role="region" aria-labelledby="main-content-heading">
   <app-recipe-builder [ingredients]="availableIngredients"
-    (recipeCreated)="onRecipeCreated($event)"></app-recipe-builder>
+    (recipeCreated)="onRecipeCreated($event)" aria-label="Recipe Builder" role="region" aria-labelledby="recipe-builder-heading"></app-recipe-builder>
 </main>

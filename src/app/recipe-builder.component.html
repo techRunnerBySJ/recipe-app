@@ -1,25 +1,29 @@
-<div class="recipe-builder">
+<div class="recipe-builder" role="region" aria-label="Recipe Builder">
   <h2>Recipe Builder</h2>
 
   <!-- Available ingredients -->
-  <section class="available">
-    <h3>Available Ingredients</h3>
+  <section class="available" role="region" aria-labelledby="available-ingredients-heading">
+    <h3 id="available-ingredients-heading">Available Ingredients</h3>
 
     @if ((ingredients() || []).length === 0) {
       <div class="empty">No ingredients available.</div>
     }
 
     @if ((ingredients() || []).length > 0) {
-      <div class="categories">
+      <div class="categories" role="listbox" aria-multiselectable="true" aria-describedby="available-ingredients-desc">
+        <p id="available-ingredients-desc" class="visually-hidden">Use buttons below to add ingredients to current recipe. Selected items are indicated.</p>
       @if (groupedIngredients().protein.length) {
-        <h4>Protein</h4>
-        <div class="items">
+        <h4 id="protein-heading">Protein</h4>
+        <div class="items" role="group" aria-labelledby="protein-heading">
           @for (ing of groupedIngredients().protein; track ing.id) {
           <button
             class="ingredient"
             (click)="addIngredient(ing.id)"
             [class.selected]="isIngredientSelected(ing.id)"
             type="button"
+            role="option"
+            [attr.aria-selected]="isIngredientSelected(ing.id)"
+            [attr.aria-label]="ing.name + ' ' + ing.calories + ' calories'"
           >
             <div class="name">{{ing.name}}</div>
             <div class="meta"><span class="badge badge-soft">{{ing.calories}} cal</span></div>
@@ -29,14 +33,17 @@
       }
 
       @if (groupedIngredients().grain.length) {
-        <h4>Grain</h4>
-        <div class="items">
+        <h4 id="grain-heading">Grain</h4>
+        <div class="items" role="group" aria-labelledby="grain-heading">
           @for (ing of groupedIngredients().grain; track ing.id) {
           <button
             class="ingredient"
             (click)="addIngredient(ing.id)"
             [class.selected]="isIngredientSelected(ing.id)"
             type="button"
+            role="option"
+            [attr.aria-selected]="isIngredientSelected(ing.id)"
+            [attr.aria-label]="ing.name + ' ' + ing.calories + ' calories'"
           >
             <div class="name">{{ing.name}}</div>
             <div class="meta"><span class="badge badge-soft">{{ing.calories}} cal</span></div>
@@ -46,14 +53,17 @@
       }
 
       @if (groupedIngredients().vegetable.length) {
-        <h4>Vegetable</h4>
-        <div class="items">
+        <h4 id="vegetable-heading">Vegetable</h4>
+        <div class="items" role="group" aria-labelledby="vegetable-heading">
           @for (ing of groupedIngredients().vegetable; track ing.id) {
           <button
             class="ingredient"
             (click)="addIngredient(ing.id)"
             [class.selected]="isIngredientSelected(ing.id)"
             type="button"
+            role="option"
+            [attr.aria-selected]="isIngredientSelected(ing.id)"
+            [attr.aria-label]="ing.name + ' ' + ing.calories + ' calories'"
           >
             <div class="name">{{ing.name}}</div>
             <div class="meta"><span class="badge badge-soft">{{ing.calories}} cal</span></div>
@@ -66,33 +76,33 @@
   </section>
 
   <!-- Current recipe -->
-  <section class="current">
-    <h3>Current Recipe</h3>
+  <section class="current" role="region" aria-labelledby="current-recipe-heading">
+    <h3 id="current-recipe-heading">Current Recipe</h3>
 
     @if (selectedIngredients().length > 0) {
       <div class="selected-list">
-      <ul>
+      <ul role="list">
         @for (id of selectedIngredients(); track id) {
-        <li>
+        <li role="listitem">
           <span class="ing-name">
             {{ getIngredientName(id) }}
           </span>
           <span class="ing-cal">
             {{ getIngredientCalories(id) }} cal
           </span>
-          <button class="remove" (click)="removeIngredient(id)" type="button">Remove</button>
+          <button class="remove" (click)="removeIngredient(id)" type="button" aria-label="Remove {{ getIngredientName(id) }} from recipe">Remove</button>
         </li>
         }
       </ul>
 
-      <form class="summary" [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
-        <label>
+      <form class="summary" [formGroup]="recipeForm" (ngSubmit)="onSubmit()" aria-describedby="totals" novalidate>
+        <label for="recipeNameInput">
           Recipe Name <span aria-hidden="true" class="required-asterisk">*</span>
-          <input formControlName="recipeName" (focus)="onNameFocus()" (blur)="onNameBlur()" />
         </label>
+        <input id="recipeNameInput" formControlName="recipeName" (focus)="onNameFocus()" (blur)="onNameBlur()" aria-required="true" [attr.aria-invalid]="recipeForm.get('recipeName')?.invalid || null" />
 
         @if ((nameFocused() || recipeForm.get('recipeName')?.touched) && recipeForm.get('recipeName')?.invalid) {
-          <div class="validation">
+          <div class="validation" role="alert" aria-live="assertive">
             @if (recipeForm.get('recipeName')?.errors?.['required']) {
               <div class="error">* Recipe name is required.</div>
             }
@@ -102,7 +112,7 @@
           </div>
         }
 
-        <div class="totals">Total Calories: <span class="badge badge-accent">{{ totalCalories() }}</span></div>
+        <div id="totals" class="totals" aria-live="polite">Total Calories: <span class="badge badge-accent">{{ totalCalories() }}</span></div>
 
         <div class="actions">
           <button
@@ -116,26 +126,26 @@
       </form>
       </div>
     } @else {
-      <div class="empty">No ingredients selected yet.</div>
+      <div class="empty" role="status" aria-live="polite">No ingredients selected yet.</div>
     }
   </section>
 
   <!-- Saved recipes -->
-  <section class="saved">
-    <h3>Saved Recipes</h3>
+  <section class="saved" role="region" aria-labelledby="saved-recipes-heading">
+    <h3 id="saved-recipes-heading">Saved Recipes</h3>
 
     @if (savedRecipes().length === 0) {
-      <div class="empty">No saved recipes yet.</div>
+      <div class="empty" role="status" aria-live="polite">No saved recipes yet.</div>
     }
 
     @if (savedRecipes().length > 0) {
-      <ul>
+      <ul role="list">
       @for (r of savedRecipes(); track r.id) {
-      <li>
+      <li role="listitem">
         <div class="saved-name">{{r.name}}</div>
         <div class="saved-meta">{{r.ingredients.length}} ingredients • {{r.totalCalories}} cal</div>
         <div>
-          <button type="button" class="btn btn-danger" (click)="removeSavedRecipe(r.id)">Remove</button>
+          <button type="button" class="btn btn-danger" (click)="removeSavedRecipe(r.id)" aria-label="Delete saved recipe {{r.name}}">Remove</button>
         </div>
       </li>
       }
