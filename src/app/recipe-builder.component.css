@@ -165,7 +165,7 @@ section {
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
 }
 
 .saved-name {
@@ -175,6 +175,11 @@ section {
 .saved-meta {
   color: var(--text-muted);
   font-size: .9rem;
+}
+
+.required-asterisk {
+  color: var(--danger);
+  margin-left: 4px;
 }
 
 /* Responsive */

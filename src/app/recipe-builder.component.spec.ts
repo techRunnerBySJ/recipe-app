@@ -179,6 +179,31 @@ describe('RecipeBuilderComponent', () => {
     saveSpy.mockRestore();
   });
 
+  it('should remove a saved recipe and refresh list', () => {
+    const svc = (comp as any).recipeStorage as RecipeStorageService;
+    const r1: Recipe = { id: 'a', name: 'A', ingredients: ['1'], totalCalories: 100, createdDate: new Date() };
+    const r2: Recipe = { id: 'b', name: 'B', ingredients: ['4'], totalCalories: 200, createdDate: new Date() };
+
+    // Seed storage
+    jest.spyOn(svc, 'getAllRecipes').mockReturnValue([r1, r2]);
+    comp.savedRecipes.set(svc.getAllRecipes());
+    expect(comp.savedRecipes().length).toBe(2);
+
+    const delSpy = jest.spyOn(svc, 'deleteRecipe').mockImplementation(() => {
+      // simulate deletion by returning only r2 in subsequent getAllRecipes calls
+      (svc.getAllRecipes as jest.Mock).mockReturnValue([r2]);
+    });
+
+    const ok = comp.removeSavedRecipe('a');
+    expect(ok).toBe(true);
+    expect(delSpy).toHaveBeenCalledWith('a');
+    expect(comp.savedRecipes().length).toBe(1);
+    expect(comp.savedRecipes()[0].id).toBe('b');
+
+    delSpy.mockRestore();
+    (svc.getAllRecipes as jest.Mock).mockRestore?.();
+  });
+
   // ------------------------------------------------------------------------------------
   // Miscellaneous
   // ------------------------------------------------------------------------------------

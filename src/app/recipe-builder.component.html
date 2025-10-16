@@ -87,17 +87,17 @@
 
       <form class="summary" [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
         <label>
-          Recipe Name
-          <input formControlName="recipeName" />
+          Recipe Name <span aria-hidden="true" class="required-asterisk">*</span>
+          <input formControlName="recipeName" (focus)="onNameFocus()" (blur)="onNameBlur()" />
         </label>
 
-        @if (recipeForm.get('recipeName')?.touched && recipeForm.get('recipeName')?.invalid) {
+        @if ((nameFocused() || recipeForm.get('recipeName')?.touched) && recipeForm.get('recipeName')?.invalid) {
           <div class="validation">
             @if (recipeForm.get('recipeName')?.errors?.['required']) {
-              <div class="error">Recipe name is required.</div>
+              <div class="error">* Recipe name is required.</div>
             }
             @if (recipeForm.get('recipeName')?.errors?.['minlength']) {
-              <div class="error">Recipe name must be at least 3 characters.</div>
+              <div class="error">* Recipe name must be at least 3 characters.</div>
             }
           </div>
         }
@@ -134,6 +134,9 @@
       <li>
         <div class="saved-name">{{r.name}}</div>
         <div class="saved-meta">{{r.ingredients.length}} ingredients • {{r.totalCalories}} cal</div>
+        <div>
+          <button type="button" class="btn btn-danger" (click)="removeSavedRecipe(r.id)">Remove</button>
+        </div>
       </li>
       }
       </ul>

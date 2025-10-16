@@ -36,6 +36,8 @@ export class RecipeBuilderComponent {
 
   savedRecipes = signal<Recipe[]>([]);
 
+  nameFocused = signal(false);
+
   private recipeStorage = inject(RecipeStorageService);
   private fb = inject(FormBuilder);
 
@@ -54,6 +56,14 @@ export class RecipeBuilderComponent {
   @Input({ alias: 'ingredients' })
   set ingredientsInput(value: Ingredient[] | null | undefined) {
     this.ingredients.set(value ?? []);
+  }
+
+  onNameFocus() {
+    this.nameFocused.set(true);
+  }
+
+  onNameBlur() {
+    this.nameFocused.set(false);
   }
 
   /**
@@ -202,6 +212,19 @@ export class RecipeBuilderComponent {
       }
       this.recipeCreated.emit(recipe);
       this.clearCurrentRecipe();
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  /**
+   * Remove a saved recipe by ID and refresh local list; returns true on success
+   */
+  removeSavedRecipe(recipeId: string): boolean {
+    try {
+      this.recipeStorage.deleteRecipe(recipeId);
+      this.savedRecipes.set(this.recipeStorage.getAllRecipes());
       return true;
     } catch (err) {
       return false;
