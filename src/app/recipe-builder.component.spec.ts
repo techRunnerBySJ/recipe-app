@@ -15,7 +15,7 @@ describe('RecipeBuilderComponent', () => {
   const SAMPLE_INGREDIENTS: Ingredient[] = [
     { id: '1', name: 'Chicken Breast', category: 'protein', calories: 165 },
     { id: '4', name: 'Rice', category: 'grain', calories: 130 },
-    { id: '6', name: 'Broccoli', category: 'vegetable', calories: 25 }
+    { id: '6', name: 'Broccoli', category: 'vegetable', calories: 25 },
   ];
 
   beforeEach(async () => {
@@ -23,10 +23,12 @@ describe('RecipeBuilderComponent', () => {
     storageService = new RecipeStorageService();
 
     await TestBed.configureTestingModule({
-      imports: [RecipeBuilderComponent]
-    }).overrideComponent(RecipeBuilderComponent, {
-      set: { template: '<div></div>' }
-    }).compileComponents();
+      imports: [RecipeBuilderComponent],
+    })
+      .overrideComponent(RecipeBuilderComponent, {
+        set: { template: '<div></div>' },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(RecipeBuilderComponent);
     comp = fixture.componentInstance as RecipeBuilderComponent;
@@ -123,7 +125,7 @@ describe('RecipeBuilderComponent', () => {
     const getSpy = jest.spyOn(storageService, 'getAllRecipes').mockReturnValue([]);
 
     // Pass save function explicitly for testing (simulates host call)
-    const success = comp.saveRecipe(r => storageService.saveRecipe(r));
+    const success = comp.saveRecipe((r) => storageService.saveRecipe(r));
 
     expect(success).toBe(true);
     expect(emitted.length).toBe(1);
@@ -144,7 +146,9 @@ describe('RecipeBuilderComponent', () => {
   });
 
   it('should handle localStorage errors gracefully', () => {
-    const badFn = () => { throw new Error('Storage failure'); };
+    const badFn = () => {
+      throw new Error('Storage failure');
+    };
     comp.recipeName.set('Oops');
     comp.selectedIngredients.set(['1']);
     const result = comp.saveRecipe(badFn);
@@ -181,8 +185,20 @@ describe('RecipeBuilderComponent', () => {
 
   it('should remove a saved recipe and refresh list', () => {
     const svc = (comp as any).recipeStorage as RecipeStorageService;
-    const r1: Recipe = { id: 'a', name: 'A', ingredients: ['1'], totalCalories: 100, createdDate: new Date() };
-    const r2: Recipe = { id: 'b', name: 'B', ingredients: ['4'], totalCalories: 200, createdDate: new Date() };
+    const r1: Recipe = {
+      id: 'a',
+      name: 'A',
+      ingredients: ['1'],
+      totalCalories: 100,
+      createdDate: new Date(),
+    };
+    const r2: Recipe = {
+      id: 'b',
+      name: 'B',
+      ingredients: ['4'],
+      totalCalories: 200,
+      createdDate: new Date(),
+    };
 
     // Seed storage
     jest.spyOn(svc, 'getAllRecipes').mockReturnValue([r1, r2]);
