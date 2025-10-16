@@ -1,0 +1,132 @@
+<div class="recipe-builder">
+  <h2>Recipe Builder</h2>
+
+  <!-- Available ingredients -->
+  <section class="available">
+    <h3>Available Ingredients</h3>
+
+    @if ((ingredients() || []).length === 0) {
+      <div class="empty">No ingredients available.</div>
+    }
+
+    @if ((ingredients() || []).length > 0) {
+      <div class="categories">
+      @if (groupedIngredients().protein.length) {
+        <h4>Protein</h4>
+        <div class="items">
+          @for (ing of groupedIngredients().protein; track ing.id) {
+          <button
+            class="ingredient"
+            (click)="addIngredient(ing.id)"
+            [class.selected]="isIngredientSelected(ing.id)"
+            type="button"
+          >
+            <div class="name">{{ing.name}}</div>
+            <div class="meta">{{ing.calories}} cal</div>
+          </button>
+          }
+        </div>
+      }
+
+      @if (groupedIngredients().grain.length) {
+        <h4>Grain</h4>
+        <div class="items">
+          @for (ing of groupedIngredients().grain; track ing.id) {
+          <button
+            class="ingredient"
+            (click)="addIngredient(ing.id)"
+            [class.selected]="isIngredientSelected(ing.id)"
+            type="button"
+          >
+            <div class="name">{{ing.name}}</div>
+            <div class="meta">{{ing.calories}} cal</div>
+          </button>
+          }
+        </div>
+      }
+
+      @if (groupedIngredients().vegetable.length) {
+        <h4>Vegetable</h4>
+        <div class="items">
+          @for (ing of groupedIngredients().vegetable; track ing.id) {
+          <button
+            class="ingredient"
+            (click)="addIngredient(ing.id)"
+            [class.selected]="isIngredientSelected(ing.id)"
+            type="button"
+          >
+            <div class="name">{{ing.name}}</div>
+            <div class="meta">{{ing.calories}} cal</div>
+          </button>
+          }
+        </div>
+      }
+      </div>
+    }
+  </section>
+
+  <!-- Current recipe -->
+  <section class="current">
+    <h3>Current Recipe</h3>
+
+    @if (selectedIngredients().length > 0) {
+      <div class="selected-list">
+      <ul>
+        @for (id of selectedIngredients(); track id) {
+        <li>
+          <span class="ing-name">
+            {{ getIngredientName(id) }}
+          </span>
+          <span class="ing-cal">
+            {{ getIngredientCalories(id) }} cal
+          </span>
+          <button class="remove" (click)="removeIngredient(id)" type="button">Remove</button>
+        </li>
+        }
+      </ul>
+
+      <div class="summary">
+        <label>
+          Recipe Name
+          <input [ngModel]="recipeName()" (ngModelChange)="recipeName.set($event)" [ngModelOptions]="{standalone: true}" />
+        </label>
+
+        <div class="totals">Total Calories: <strong>{{ totalCalories() }}</strong></div>
+
+        <div class="actions">
+          <button
+            class="save"
+            (click)="saveRecipe()"
+            [disabled]="!recipeName().trim() || selectedIngredients().length === 0"
+            type="button"
+          >Save Recipe</button>
+
+          <button class="clear" (click)="clearCurrentRecipe()" type="button">Clear</button>
+        </div>
+      </div>
+      </div>
+    } @else {
+      <div class="empty">No ingredients selected yet.</div>
+    }
+  </section>
+
+  <!-- Saved recipes -->
+  <section class="saved">
+    <h3>Saved Recipes</h3>
+
+    @if (savedRecipes().length === 0) {
+      <div class="empty">No saved recipes yet.</div>
+    }
+
+    @if (savedRecipes().length > 0) {
+      <ul>
+      @for (r of savedRecipes(); track r.id) {
+      <li>
+        <div class="saved-name">{{r.name}}</div>
+        <div class="saved-meta">{{r.ingredients.length}} ingredients • {{r.totalCalories}} cal</div>
+      </li>
+      }
+      </ul>
+    }
+  </section>
+</div>

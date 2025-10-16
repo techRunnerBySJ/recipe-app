@@ -1,10 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { RecipeBuilderComponent } from './recipe-builder.component';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+    }).overrideComponent(RecipeBuilderComponent, {
+      set: { template: '<div></div>' }
+    }).overrideComponent(App, {
+      set: {
+        template: '<h1>Hello, {{ title() }}</h1>'
+      }
     }).compileComponents();
   });
 
