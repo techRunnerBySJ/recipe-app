@@ -22,7 +22,7 @@
             type="button"
           >
             <div class="name">{{ing.name}}</div>
-            <div class="meta">{{ing.calories}} cal</div>
+            <div class="meta"><span class="badge badge-soft">{{ing.calories}} cal</span></div>
           </button>
           }
         </div>
@@ -39,7 +39,7 @@
             type="button"
           >
             <div class="name">{{ing.name}}</div>
-            <div class="meta">{{ing.calories}} cal</div>
+            <div class="meta"><span class="badge badge-soft">{{ing.calories}} cal</span></div>
           </button>
           }
         </div>
@@ -56,7 +56,7 @@
             type="button"
           >
             <div class="name">{{ing.name}}</div>
-            <div class="meta">{{ing.calories}} cal</div>
+            <div class="meta"><span class="badge badge-soft">{{ing.calories}} cal</span></div>
           </button>
           }
         </div>
@@ -85,25 +85,35 @@
         }
       </ul>
 
-      <div class="summary">
+      <form class="summary" [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
         <label>
           Recipe Name
-          <input [ngModel]="recipeName()" (ngModelChange)="recipeName.set($event)" [ngModelOptions]="{standalone: true}" />
+          <input formControlName="recipeName" />
         </label>
 
-        <div class="totals">Total Calories: <strong>{{ totalCalories() }}</strong></div>
+        @if (recipeForm.get('recipeName')?.touched && recipeForm.get('recipeName')?.invalid) {
+          <div class="validation">
+            @if (recipeForm.get('recipeName')?.errors?.['required']) {
+              <div class="error">Recipe name is required.</div>
+            }
+            @if (recipeForm.get('recipeName')?.errors?.['minlength']) {
+              <div class="error">Recipe name must be at least 3 characters.</div>
+            }
+          </div>
+        }
+
+        <div class="totals">Total Calories: <span class="badge badge-accent">{{ totalCalories() }}</span></div>
 
         <div class="actions">
           <button
-            class="save"
-            (click)="saveRecipe()"
-            [disabled]="!recipeName().trim() || selectedIngredients().length === 0"
-            type="button"
+            class="btn btn-primary save"
+            type="submit"
+            [disabled]="recipeForm.invalid || selectedIngredients().length === 0"
           >Save Recipe</button>
 
-          <button class="clear" (click)="clearCurrentRecipe()" type="button">Clear</button>
+          <button class="btn btn-muted clear" (click)="clearCurrentRecipe()" type="button">Clear</button>
         </div>
-      </div>
+      </form>
       </div>
     } @else {
       <div class="empty">No ingredients selected yet.</div>

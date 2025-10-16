@@ -189,4 +189,48 @@ describe('RecipeBuilderComponent', () => {
     expect(comp.recipeName()).toBe('');
     expect(comp.selectedIngredients().length).toBe(0);
   });
+
+  // ------------------------------------------------------------------------------------
+  // Reactive Form: Validators & Submit
+  // ------------------------------------------------------------------------------------
+  it('should have invalid form when name empty and prevent submit', () => {
+    const saveSpy = jest.spyOn(comp, 'saveRecipe');
+    comp.recipeForm.get('recipeName')?.setValue('');
+    comp.selectedIngredients.set(['1']);
+
+    comp.onSubmit();
+
+    expect(comp.recipeForm.invalid).toBe(true);
+    expect(saveSpy).not.toHaveBeenCalled();
+    saveSpy.mockRestore();
+  });
+
+  it('should enforce minlength validator (name < 3 chars)', () => {
+    comp.recipeForm.get('recipeName')?.setValue('ab');
+    comp.recipeForm.get('recipeName')?.markAsTouched();
+    const ctrl = comp.recipeForm.get('recipeName');
+    expect(ctrl?.invalid).toBe(true);
+    expect(ctrl?.errors?.['minlength']).toBeTruthy();
+  });
+
+  it('should submit via onSubmit when form valid and ingredients selected', () => {
+    const saveSpy = jest.spyOn(comp, 'saveRecipe').mockReturnValue(true as any);
+    comp.recipeForm.get('recipeName')?.setValue('Valid Name');
+    comp.selectedIngredients.set(['1']);
+
+    comp.onSubmit();
+
+    expect(comp.recipeForm.valid).toBe(true);
+    expect(saveSpy).toHaveBeenCalled();
+    saveSpy.mockRestore();
+  });
+
+  it('should reset form control when clearing current recipe', () => {
+    comp.recipeForm.get('recipeName')?.setValue('To be cleared');
+    comp.selectedIngredients.set(['1']);
+    comp.clearCurrentRecipe();
+
+    expect(comp.recipeForm.get('recipeName')?.value).toBe('');
+    expect(comp.recipeName()).toBe('');
+  });
 });

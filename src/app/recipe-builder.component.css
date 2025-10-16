@@ -70,6 +70,10 @@ section {
   font-size: .9rem;
 }
 
+.ingredient .badge {
+  align-self: start;
+}
+
 .ingredient.selected {
   background: #eff6ff;
   border-color: #bfdbfe;
@@ -133,6 +137,15 @@ section {
 .actions .save:disabled {
   opacity: .5;
   cursor: not-allowed;
+}
+
+/* Better focus states */
+.ingredient:focus-visible,
+.actions .save:focus-visible,
+.actions .clear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: var(--primary);
 }
 
 .empty {

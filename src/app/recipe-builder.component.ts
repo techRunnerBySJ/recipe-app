@@ -1,6 +1,7 @@
 import { Component, Input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { inject } from '@angular/core';
 import { RecipeStorageService } from './recipe-storage.service';
 
@@ -22,7 +23,7 @@ export type Recipe = {
 @Component({
   selector: 'app-recipe-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './recipe-builder.component.html',
   styleUrls: ['./recipe-builder.component.css'],
 })
@@ -35,13 +36,22 @@ export class RecipeBuilderComponent {
 
   savedRecipes = signal<Recipe[]>([]);
 
-  @Input('ingredients')
   private recipeStorage = inject(RecipeStorageService);
+  private fb = inject(FormBuilder);
+
+  recipeForm: FormGroup = this.fb.group({
+    recipeName: ['', [Validators.required, Validators.minLength(3)]]
+  });
 
   constructor() {
     this.savedRecipes.set(this.recipeStorage.getAllRecipes());
+    const nameCtrl = this.recipeForm.get('recipeName');
+    nameCtrl?.valueChanges.subscribe((val) => {
+      this.recipeName.set((val ?? '').toString());
+    });
   }
 
+  @Input({ alias: 'ingredients' })
   set ingredientsInput(value: Ingredient[] | null | undefined) {
     this.ingredients.set(value ?? []);
   }
@@ -138,6 +148,7 @@ export class RecipeBuilderComponent {
   clearCurrentRecipe() {
     this.recipeName.set('');
     this.selectedIngredients.set([]);
+    this.recipeForm.reset({ recipeName: '' });
   }
 
   /**
@@ -154,11 +165,25 @@ export class RecipeBuilderComponent {
    * @param recipeStorageSaveFn Optional function to save recipe (for testability); if not supplied, uses internal service
    * @returns true if saved successfully, false otherwise
    */
+  onSubmit() {
+    this.recipeForm.markAllAsTouched();
+    if (this.recipeForm.invalid) {
+      return;
+    }
+    this.saveRecipe();
+  }
+
   saveRecipe(recipeStorageSaveFn?: (r: Recipe) => void) {
-    const name = this.recipeName().trim();
+    const formName = (this.recipeForm.get('recipeName')?.value ?? '').toString();
+    const name = (formName || this.recipeName()).trim();
     const ingredients = this.selectedIngredients();
     if (!name) return false;
     if (!ingredients || ingredients.length === 0) return false;
+
+    // If user interacted with the form, enforce form validators
+    if (this.recipeForm.dirty && this.recipeForm.invalid) {
+      return false;
+    }
 
     const recipe: Recipe = {
       id: `recipe-${Date.now()}`,
